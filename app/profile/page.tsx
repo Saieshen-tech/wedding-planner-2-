@@ -27,6 +27,23 @@ export default function ProfilePage() {
     notes: "",
   })
 
+  // ✅ Safe localStorage stats setup
+  const [stats, setStats] = useState({
+    guests: 0,
+    tasks: 0,
+    budgetItems: 0,
+  })
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const guests = JSON.parse(localStorage.getItem("wedding_guests") || "[]").length
+      const tasks = JSON.parse(localStorage.getItem("wedding_tasks") || "[]").filter((t: any) => t.completed).length
+      const budgetItems = JSON.parse(localStorage.getItem("wedding_budget") || '{"items":[]}').items.length
+
+      setStats({ guests, tasks, budgetItems })
+    }
+  }, [])
+
   useEffect(() => {
     if (user) {
       setFormData({
@@ -265,21 +282,15 @@ export default function ProfilePage() {
               <div className="grid gap-4 sm:grid-cols-3">
                 <div className="rounded-lg border border-border/50 p-4">
                   <p className="text-sm text-muted-foreground">Guests Added</p>
-                  <p className="mt-1 text-2xl font-serif">
-                    {JSON.parse(localStorage.getItem("wedding_guests") || "[]").length}
-                  </p>
+                  <p className="mt-1 text-2xl font-serif">{stats.guests}</p>
                 </div>
                 <div className="rounded-lg border border-border/50 p-4">
                   <p className="text-sm text-muted-foreground">Tasks Completed</p>
-                  <p className="mt-1 text-2xl font-serif">
-                    {JSON.parse(localStorage.getItem("wedding_tasks") || "[]").filter((t: any) => t.completed).length}
-                  </p>
+                  <p className="mt-1 text-2xl font-serif">{stats.tasks}</p>
                 </div>
                 <div className="rounded-lg border border-border/50 p-4">
                   <p className="text-sm text-muted-foreground">Budget Items</p>
-                  <p className="mt-1 text-2xl font-serif">
-                    {JSON.parse(localStorage.getItem("wedding_budget") || '{"items":[]}').items.length}
-                  </p>
+                  <p className="mt-1 text-2xl font-serif">{stats.budgetItems}</p>
                 </div>
               </div>
             </CardContent>
