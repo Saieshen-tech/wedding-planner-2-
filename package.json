@@ -1,21 +1,16 @@
 {
-
-  "name": "my-v0-project",
-
-  "version": "0.1.0",
-
+  "name": "wedding-planner-2-",
+  "version": "1.0.0",
   "private": true,
-
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
-
-    "build": "next build && next export",
-
     "dev": "next dev",
-
-    "lint": "eslint .",
-
-    "start": "next start"
-
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "format": "prettier --write ."
   },
 
   "dependencies": {
