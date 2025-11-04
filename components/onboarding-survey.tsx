@@ -78,7 +78,7 @@ export function OnboardingSurvey({ onComplete, onSkip }: OnboardingSurveyProps) 
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-[#FFF8F0] via-[#F5E6D3] to-[#FFE4E1] p-4">
-      {showConfetti && <ConfettiAnimation />}
+      {showConfetti && <ConfettiAnimation trigger={showConfetti} />}
 
       <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="w-full max-w-2xl">
         <Card className="border-[#D4AF37]/20 bg-white/95 backdrop-blur-sm shadow-2xl">
