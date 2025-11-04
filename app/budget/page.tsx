@@ -456,7 +456,8 @@ export default function BudgetPage() {
                           cx="50%"
                           cy="50%"
                           outerRadius={100}
-                          label={(entry) => `${entry.category}: R${entry.spent.toLocaleString()}`}
+                         label={(entry) => `${(entry as any).category}: R${Number((entry as any).spent).toLocaleString()}`}
+
                         >
                           {chartData.map((entry, index) => (
                             <Cell key={`cell-${index}`} fill={entry.fill} />
