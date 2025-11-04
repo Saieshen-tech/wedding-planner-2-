@@ -2,8 +2,34 @@
 
 import * as React from 'react'
 import * as RechartsPrimitive from 'recharts'
-
 import { cn } from '@/lib/utils'
+
+// Since TooltipProps and its generics often fail to import reliably in Next.js/TS setups,
+// we define the component's required props manually.
+import { TooltipProps } from 'recharts'
+type NameType = any
+type ValueType = any
+
+// 1. CUSTOM INTERFACE FOR TOOLTIP CONTENT PROPS (FIXED GENERIC ERROR)
+interface ChartTooltipContentProps {
+  active?: boolean;
+  payload?: any[];
+  label?: any;
+  // FIX: Pass generic types to RechartsPrimitive.TooltipProps to resolve error 2314
+  labelFormatter?: RechartsPrimitive.TooltipProps<ValueType, NameType>['labelFormatter']; 
+  labelClassName?: string;
+  // FIX: Pass generic types to RechartsPrimitive.TooltipProps to resolve error 2314
+  formatter?: RechartsPrimitive.TooltipProps<ValueType, NameType>['formatter'];
+  color?: string;
+  nameKey?: string;
+  labelKey?: string;
+  // Custom props:
+  className?: string;
+  hideLabel?: boolean;
+  hideIndicator?: boolean;
+  indicator?: 'line' | 'dot' | 'dashed';
+}
+// END CUSTOM INTERFACE
 
 // Format: { THEME_NAME: CSS_SELECTOR }
 const THEMES = { light: '', dark: '.dark' } as const
@@ -90,7 +116,7 @@ ${colorConfig
     const color =
       itemConfig.theme?.[theme as keyof typeof itemConfig.theme] ||
       itemConfig.color
-    return color ? `  --color-${key}: ${color};` : null
+    return color ? `  --color-${key}: ${color};` : null
   })
   .join('\n')}
 }
@@ -104,6 +130,7 @@ ${colorConfig
 
 const ChartTooltip = RechartsPrimitive.Tooltip
 
+// 2. USE CUSTOM INTERFACE
 function ChartTooltipContent({
   active,
   payload,
@@ -118,14 +145,7 @@ function ChartTooltipContent({
   color,
   nameKey,
   labelKey,
-}: React.ComponentProps<typeof RechartsPrimitive.Tooltip> &
-  React.ComponentProps<'div'> & {
-    hideLabel?: boolean
-    hideIndicator?: boolean
-    indicator?: 'line' | 'dot' | 'dashed'
-    nameKey?: string
-    labelKey?: string
-  }) {
+}: ChartTooltipContentProps) {
   const { config } = useChart()
 
   const tooltipLabel = React.useMemo(() => {
@@ -179,7 +199,7 @@ function ChartTooltipContent({
     >
       {!nestLabel ? tooltipLabel : null}
       <div className="grid gap-1.5">
-        {payload.map((item, index) => {
+        {payload.map((item: any, index: number) => { 
           const key = `${nameKey || item.name || item.dataKey || 'value'}`
           const itemConfig = getPayloadConfigFromPayload(config, item, key)
           const indicatorColor = color || item.payload.fill || item.color
@@ -202,7 +222,7 @@ function ChartTooltipContent({
                     !hideIndicator && (
                       <div
                         className={cn(
-                          'shrink-0 rounded-[2px] border-(--color-border) bg-(--color-bg)',
+                          'shrink-0 rounded-[2px] border-[--color-border] bg-[--color-bg]',
                           {
                             'h-2.5 w-2.5': indicator === 'dot',
                             'w-1': indicator === 'line',
@@ -250,14 +270,19 @@ function ChartTooltipContent({
 
 const ChartLegend = RechartsPrimitive.Legend
 
+// 3. FIXED LEGEND SIGNATURE
 function ChartLegendContent({
   className,
   hideIcon = false,
   payload,
   verticalAlign = 'bottom',
   nameKey,
-}: React.ComponentProps<'div'> &
-  Pick<RechartsPrimitive.LegendProps, 'payload' | 'verticalAlign'> & {
+}: React.ComponentProps<'div'> & {
+    // Manually define the required Recharts props to bypass the 'Pick' constraint error
+    payload?: any[] 
+    verticalAlign?: RechartsPrimitive.LegendProps['verticalAlign']
+    
+    // Your custom props
     hideIcon?: boolean
     nameKey?: string
   }) {
@@ -275,7 +300,7 @@ function ChartLegendContent({
         className,
       )}
     >
-      {payload.map((item) => {
+      {payload.map((item: any) => {
         const key = `${nameKey || item.dataKey || 'value'}`
         const itemConfig = getPayloadConfigFromPayload(config, item, key)
 
